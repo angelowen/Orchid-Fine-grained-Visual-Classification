@@ -81,7 +81,7 @@ def generate_heat(args, features:list):
         # if use original backbone without our module, 
         # please set classifier to your model's classifier.
         gramcam = simple_grad_cam(f.unsqueeze(0), 
-                                  classifier=torch.ones(f.size(-1), 219)/f.size(-1), 
+                                  classifier=torch.ones(f.size(-1), args.num_classes)/f.size(-1), 
                                   target_class=args.target_class)
         gramcam = gramcam.detach().numpy()
         gramcam = cv2.resize(gramcam, (args.data_size, args.data_size))

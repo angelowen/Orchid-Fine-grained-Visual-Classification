@@ -419,13 +419,13 @@ if __name__ == "__main__":
 
         if epoch == 0 or (epoch+1) % args.test_freq == 0:
             test_acc = test(args, model, test_loader)
-            # wandb.log({"test_acc":test_acc})
+            wandb.log({"test_acc":test_acc})
             # save to best.pt
             torch.save(save_dict, args.save_root + "backup/last.pth")
             if test_acc > best_acc:
                 best_acc = test_acc
-                # wandb.run.summary["best_accuracy"] = best_acc # upload to wandb
-                # wandb.run.summary["best_epoch"] = epoch+1 # upload to wandb
+                wandb.run.summary["best_accuracy"] = best_acc # upload to wandb
+                wandb.run.summary["best_epoch"] = epoch+1 # upload to wandb
                 if os.path.isfile(args.save_root + "backup/best.pth"):
                     os.remove(args.save_root + "backup/best.pth")
                 torch.save(save_dict, args.save_root + "backup/best.pth")
