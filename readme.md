@@ -12,13 +12,14 @@ backbones, including CNN-based or Transformer-based networks to provide strongly
 * install requirements
 
 #### Prepare dataset
+```
 -/dataset
     -| 1.jpg
     -| 2.jpg
     ...
     -|train_label.csv
     -|val_label.csv
-
+```
 #### Our pretrained model
 
 Download the pretrained model from this url: https://drive.google.com/drive/folders/1ivMJl4_EgE-EVU_5T8giQTwcNQ6RPtAo?usp=sharing    
