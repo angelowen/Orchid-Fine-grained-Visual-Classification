@@ -1,0 +1,8 @@
+*.txt
+*.pth
+*.zip
+wandb/
+records/
+dataset/
+backup/*
+models/*.pth

@@ -1,28 +1,27 @@
 import os
-import wandb
 import torch
 import torch.nn as nn
 import json
 import numpy as np
 import math
 import copy
-
+from dataset import TrainOrchidDataset,ValOrchidDataset
 from data.dataset import ImageDataset
 from config_eval import get_args
-
+from torchvision import transforms
 import tqdm
-
+import os
+os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 
 def set_environment(args):
 
-    args.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-   
+    args.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    test_set = ImageDataset(istrain=False, 
-                           root=args.val_root,
-                           data_size=args.data_size,
-                           return_index=False)
-    
+    data_transform = transforms.Compose([
+        transforms.CenterCrop(args.data_size),
+        transforms.ToTensor(),
+    ])
+    test_set = ValOrchidDataset(args.data_root,data_transform)
     test_loader = torch.utils.data.DataLoader(test_set, num_workers=1, shuffle=True, batch_size=args.batch_size)
 
     print("test samples: {}, test batchs: {}".format(len(test_set), len(test_loader)))

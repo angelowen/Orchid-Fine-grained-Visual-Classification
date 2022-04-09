@@ -5,12 +5,9 @@ def get_args():
 
     parser = argparse.ArgumentParser("FineGrained Image Classification Task")
     # save path and dataset information
-    parser.add_argument("--exp_name", default="CUB200#SwinVit@TWCC1-GCN1-005")
+    parser.add_argument("--exp_name", default="Orchid2022")
     
-    parser.add_argument("--train_root", 
-        default="../datas/train/", type=str) # "../NABirds/train/"
-    parser.add_argument("--val_root", 
-        default="../datas/test/", type=str)
+    parser.add_argument("--data_root", default="./dataset", type=str) 
     parser.add_argument("--data_size", default=384, type=int)
     parser.add_argument("--num_rows", default=0, type=int)
     parser.add_argument("--num_cols", default=0, type=int)
@@ -34,10 +31,10 @@ def get_args():
     
     # loader
     parser.add_argument("--num_workers", default=2, type=int)
-    parser.add_argument("--batch_size", default=8, type=int)
+    parser.add_argument("--batch_size", default=4, type=int)
     
     # about model building
-    parser.add_argument("--num_classes", default=200, type=int)
+    parser.add_argument("--num_classes", default=219, type=int)
     
     # abput learning rate scheduler
     parser.add_argument("--warmup_batchs", default=800, type=int)
@@ -54,6 +51,7 @@ def get_args():
     parser.add_argument("--test_freq", default=5, type=int)
     parser.add_argument("--test_global_top_confs", default=[1, 3, 5], type=list)
     parser.add_argument("--test_select_top_confs", default=[1, 3, 5, 7, 9], type=list)
+    parser.add_argument("--pretrained_path", default='./backup/pretrained.pth', type=str)
 
     args = parser.parse_args()
     args = build_record_folder(args)
@@ -73,9 +71,9 @@ def build_record_folder(args):
     print("...{}...".format(args.save_root), end="")
     
     # save labeled images path and unlabeled images path.
-    os.makedirs(args.save_root + "data_info/", exist_ok=True)
+    # os.makedirs(args.save_root + "data_info/", exist_ok=True)
     os.makedirs(args.save_root + "backup/", exist_ok=True)
-    os.makedirs(args.save_root + "distributions/", exist_ok=True)
+    # os.makedirs(args.save_root + "distributions/", exist_ok=True)
     
     print("...{}...".format(args.save_root + "x_ux_info/"), end="")
     print("...finish")

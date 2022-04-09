@@ -5,10 +5,8 @@ def get_args():
 
     parser = argparse.ArgumentParser("")
     
-    parser.add_argument("--pretrained_path", default="./backup/NABirds/best.pth", type=str)
-
-    parser.add_argument("--val_root", 
-        default="E:/Project/Datasets/nabirds/NABirds/test/", type=str)
+    parser.add_argument("--pretrained_path", default="./records/Orchid2022/backup/best.pth", type=str)
+    parser.add_argument("--data_root", default="./dataset", type=str) 
     parser.add_argument("--data_size", default=384, type=int)
     parser.add_argument("--num_rows", default=0, type=int)
     parser.add_argument("--num_cols", default=0, type=int)
@@ -29,17 +27,17 @@ def get_args():
     # [2048, 512, 128, 32] for CUB200-2011
     # [256, 128, 64, 32] for NABirds
     parser.add_argument("--num_selects",
-        default=[256, 128, 64, 32], type=list)
+        default=[2048, 512, 128, 32], type=list)
     parser.add_argument("--global_feature_dim", default=1536, type=int)
     
     # loader
-    parser.add_argument("--num_workers", default=2, type=int)
-    parser.add_argument("--batch_size", default=8, type=int)
+    parser.add_argument("--num_workers", default=4, type=int)
+    parser.add_argument("--batch_size", default=4, type=int)
     
     # about model building
-    parser.add_argument("--num_classes", default=555, type=int)
+    parser.add_argument("--num_classes", default=219, type=int)
     
-    parser.add_argument("--test_global_top_confs", default=[0, 1, 2, 3, 4, 5], type=list)
+    parser.add_argument("--test_global_top_confs", default=[1,3, 5], type=list)
 
     args = parser.parse_args()
 

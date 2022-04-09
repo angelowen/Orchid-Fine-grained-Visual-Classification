@@ -11,9 +11,9 @@ import cv2
 import torchvision.transforms as transforms
 from PIL import Image
 import matplotlib.pyplot as plt
-
 from config_plot import get_args
-
+import os
+os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 
 def set_environment(args):
 
@@ -61,7 +61,7 @@ def simple_grad_cam(features, classifier, target_class):
     features = nn.Parameter(features)
 
     logits = torch.matmul(features, classifier)
-    
+
     logits[0, :, :, target_class].sum().backward()
     features_grad = features.grad[0].sum(0).sum(0).unsqueeze(0).unsqueeze(0)
     gramcam = F.relu(features_grad * features[0])
@@ -81,7 +81,7 @@ def generate_heat(args, features:list):
         # if use original backbone without our module, 
         # please set classifier to your model's classifier.
         gramcam = simple_grad_cam(f.unsqueeze(0), 
-                                  classifier=torch.ones(f.size(-1), 200)/f.size(-1), 
+                                  classifier=torch.ones(f.size(-1), 219)/f.size(-1), 
                                   target_class=args.target_class)
         gramcam = gramcam.detach().numpy()
         gramcam = cv2.resize(gramcam, (args.data_size, args.data_size))
@@ -111,18 +111,13 @@ def main(args, img, model):
     img = img.to(args.device)
     with torch.no_grad():
         features = model(img.unsqueeze(0))
-
+        print(np.shape(features[0]))
     heatmap = generate_heat(args, features)
 
     plt_img = rgb_img * 0.5 + heatmap * 0.5
     plt_img = plt_img.astype(np.uint8)
-
-    cv2.namedWindow('heatmap', 0)
-    cv2.imshow('heatmap', plt_img)
-    save_path = args.img_path.replace('.'+args.img_path.split('.')[-1], "") + \
-        "_heat.jpg"
+    save_path = args.img_path.replace('.'+args.img_path.split('.')[-1], "") + "_heat.jpg"
     cv2.imwrite(save_path, plt_img)
-    cv2.waitKey(0)
 
 
 

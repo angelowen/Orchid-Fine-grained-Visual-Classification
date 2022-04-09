@@ -6,17 +6,10 @@ import json
 import numpy as np
 import math
 import copy
-# import torchvision.models as torch_models
-
+from dataset import TrainOrchidDataset,ValOrchidDataset
 from data.dataset import ImageDataset
 from config import get_args
-
-# import apex
-# https://nvidia.github.io/apex/amp.html
-
-def save_json(path, data):
-    with open(path, "w") as fjson:
-        fjson.write(json.dumps(data, indent=2))
+from torchvision import transforms
 
 
 def get_lr(optimizer):
@@ -33,21 +26,13 @@ def adjust_lr(iteration, optimizer, schedule):
 def set_environment(args):
 
     args.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-
-    train_set = ImageDataset(istrain=True, 
-                            root=args.train_root,
-                            data_size=args.data_size,
-                            return_index=True)
-    save_json(args.save_root + "data_info/train_indexs.json", train_set.data_infos) # save train path and index.
-
-    train_loader = torch.utils.data.DataLoader(train_set, num_workers=args.num_workers, shuffle=True, batch_size=args.batch_size)
-
-    test_set = ImageDataset(istrain=False, 
-                           root=args.val_root,
-                           data_size=args.data_size,
-                           return_index=False)
-    save_json(args.save_root + "data_info/test_indexs.json", test_set.data_infos) # save test path and index.
-    
+    data_transform = transforms.Compose([
+        transforms.CenterCrop(args.data_size),
+        transforms.ToTensor(),
+    ])
+    train_set = TrainOrchidDataset(args.data_root,data_transform)
+    test_set = ValOrchidDataset(args.data_root,data_transform)
+    train_loader = torch.utils.data.DataLoader(train_set, num_workers=args.num_workers, shuffle=True, batch_size=args.batch_size) 
     test_loader = torch.utils.data.DataLoader(test_set, num_workers=1, shuffle=False, batch_size=args.batch_size)
 
     print("train samples: {}, train batchs: {}".format(len(train_set), len(train_loader)))
@@ -100,6 +85,20 @@ def set_environment(args):
                 global_feature_dim=args.global_feature_dim
             )
 
+    checkpoint = torch.load(args.pretrained_path)
+    pretrained_dict = checkpoint['model']
+    model_dict = model.state_dict()
+    # 1. filter out unnecessary keys
+    pretrained_dict = {k: v for k, v in pretrained_dict.items() if k in model_dict}
+    for k in ['classifier_l0.3.weight','classifier_l0.3.bias','classifier_l1.3.weight','classifier_l1.3.bias','classifier_l2.3.weight','classifier_l2.3.bias','classifier_l3.3.weight','classifier_l3.3.bias','gcn.classifier.weight','gcn.classifier.bias']:
+        del pretrained_dict[k]
+    # 2. overwrite entries in the existing state dict
+    model_dict.update(pretrained_dict) 
+    # 3. load the new state dict
+    model.load_state_dict(model_dict)
+
+    # checkpoint = torch.load(args.pretrained_path)
+    # model.load_state_dict(checkpoint['model'])
     model.to(args.device)
     
     if args.optimizer_name == "sgd":
@@ -131,7 +130,7 @@ def train(args, epoch, model, scaler, optimizer, schedules, train_loader, save_d
     model.train()
 
     optimizer.zero_grad()
-    for batch_id, (ids, datas, labels) in enumerate(train_loader):
+    for batch_id, (datas, labels) in enumerate(train_loader):
 
         # adjust learning rate
         iterations = epoch * len(train_loader) + batch_id
@@ -143,20 +142,20 @@ def train(args, epoch, model, scaler, optimizer, schedules, train_loader, save_d
        
         """ forward """
         datas, labels = datas.to(args.device), labels.to(args.device)
+
+        # with torch.cuda.amp.autocast():
+        losses, accuracys = model(datas, labels)
         
-        with torch.cuda.amp.autocast():
-            losses, accuracys = model(datas, labels)
-            
-            loss = 0
-            for name in losses:
-                if "selected" in name:
-                    loss += losses[name]
-                if "ori" in name:
-                    loss += losses[name]
-                else:
-                    loss += losses[name]
-            
-            loss /= args.update_freq
+        loss = 0
+        for name in losses:
+            if "selected" in name:
+                loss += losses[name]
+            if "ori" in name:
+                loss += losses[name]
+            else:
+                loss += losses[name]
+        
+        loss /= args.update_freq
         
         scaler.scale(loss).backward()
 
@@ -385,10 +384,7 @@ def test(args, model, test_loader):
 if __name__ == "__main__":
     args = get_args()
     
-    wandb.init(entity='',
-               project="",
-               name=args.exp_name,
-               config=args)
+    wandb.init(project="Orchid",name=args.exp_name,config=args)
 
     train_loader, test_loader, model, optimizer, schedule = set_environment(args)
 
@@ -428,12 +424,12 @@ if __name__ == "__main__":
             torch.save(save_dict, args.save_root + "backup/last.pth")
             if test_acc > best_acc:
                 best_acc = test_acc
-                wandb.run.summary["best_accuracy"] = best_acc # upload to wandb
-                wandb.run.summary["best_epoch"] = epoch+1 # upload to wandb
+                # wandb.run.summary["best_accuracy"] = best_acc # upload to wandb
+                # wandb.run.summary["best_epoch"] = epoch+1 # upload to wandb
                 if os.path.isfile(args.save_root + "backup/best.pth"):
                     os.remove(args.save_root + "backup/best.pth")
                 torch.save(save_dict, args.save_root + "backup/best.pth")
 
-        # save to last.pt
-        if os.path.isfile(args.save_root + "backup/last.pth"):
-            os.remove(args.save_root + "backup/last.pth")
+        # # save to last.pt
+        # if os.path.isfile(args.save_root + "backup/last.pth"):
+        #     os.remove(args.save_root + "backup/last.pth")
