@@ -6,3 +6,5 @@ records/
 dataset/
 backup/*
 models/*.pth
+tmp.py
+*.pyc

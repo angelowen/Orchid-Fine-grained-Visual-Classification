@@ -7,10 +7,13 @@ import numpy as np
 import math
 import copy
 from dataset import TrainOrchidDataset,ValOrchidDataset
-from data.dataset import ImageDataset
 from config import get_args
-from torchvision import transforms
-
+import torchvision.transforms as transforms
+from pathlib import Path
+from PIL import Image
+import pandas as pd
+import os
+from utils import SAM,enable_running_stats,smooth_crossentropy,disable_running_stats
 
 def get_lr(optimizer):
     for param_group in optimizer.param_groups:
@@ -26,12 +29,27 @@ def adjust_lr(iteration, optimizer, schedule):
 def set_environment(args):
 
     args.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-    data_transform = transforms.Compose([
-        transforms.CenterCrop(args.data_size),
-        transforms.ToTensor(),
+    normalize = transforms.Normalize(
+            mean=[0.485, 0.456, 0.406],
+            std=[0.229, 0.224, 0.225]
+    )
+    train_transforms = transforms.Compose([
+                        transforms.Resize((600, 600), Image.BILINEAR),
+                        transforms.CenterCrop((args.data_size, args.data_size)),
+                        transforms.RandomHorizontalFlip(),
+                        transforms.RandomApply([transforms.GaussianBlur(kernel_size=(5, 5), sigma=(0.1, 5))], p=0.1),
+                        transforms.RandomAdjustSharpness(sharpness_factor=1.5, p=0.1),
+                        transforms.ToTensor(),
+                        normalize
     ])
-    train_set = TrainOrchidDataset(args.data_root,data_transform)
-    test_set = ValOrchidDataset(args.data_root,data_transform)
+    val_transforms = transforms.Compose([
+                        transforms.Resize((600, 600), Image.BILINEAR),
+                        transforms.CenterCrop((args.data_size, args.data_size)),
+                        transforms.ToTensor(),
+                        normalize
+    ])
+    train_set = TrainOrchidDataset(args.data_root,train_transforms)
+    test_set = ValOrchidDataset(args.data_root,val_transforms)
     train_loader = torch.utils.data.DataLoader(train_set, num_workers=args.num_workers, shuffle=True, batch_size=args.batch_size) 
     test_loader = torch.utils.data.DataLoader(test_set, num_workers=1, shuffle=False, batch_size=args.batch_size)
 
@@ -96,9 +114,6 @@ def set_environment(args):
     model_dict.update(pretrained_dict) 
     # 3. load the new state dict
     model.load_state_dict(model_dict)
-
-    # checkpoint = torch.load(args.pretrained_path)
-    # model.load_state_dict(checkpoint['model'])
     model.to(args.device)
     
     if args.optimizer_name == "sgd":
@@ -109,7 +124,9 @@ def set_environment(args):
                                     weight_decay=args.wdecay)
     elif args.optimizer_name == "adamw":
         optimizer = torch.optim.AdamW(model.parameters(), lr=args.max_lr)
-
+    elif args.optimizer_name == "Sam":
+        base_optimizer = torch.optim.SGD
+        optimizer = SAM(model.parameters(), base_optimizer, rho=2.0, adaptive=True, lr=0.005, momentum=0.9, weight_decay=0.0005)
     # lr schedule
     total_batchs = args.max_epochs * len(train_loader)
     iters = np.arange(total_batchs - args.warmup_batchs)
@@ -143,7 +160,10 @@ def train(args, epoch, model, scaler, optimizer, schedules, train_loader, save_d
         """ forward """
         datas, labels = datas.to(args.device), labels.to(args.device)
 
-        # with torch.cuda.amp.autocast():
+        if args.optimizer_name == "Sam":
+            # first forward-backward step
+            enable_running_stats(model)
+
         losses, accuracys = model(datas, labels)
         
         loss = 0
@@ -157,12 +177,30 @@ def train(args, epoch, model, scaler, optimizer, schedules, train_loader, save_d
         
         loss /= args.update_freq
         
-        scaler.scale(loss).backward()
 
-        if (batch_id+1) % args.update_freq == 0:
-            scaler.step(optimizer)
-            scaler.update() # next batch.
-            optimizer.zero_grad()
+        if args.optimizer_name == "Sam":
+            loss.backward()
+            optimizer.first_step(zero_grad=True)
+            # second forward-backward step
+            disable_running_stats(model) 
+            losses, accuracys = model(datas, labels)
+            loss = 0
+            for name in losses:
+                if "selected" in name:
+                    loss += losses[name]
+                if "ori" in name:
+                    loss += losses[name]
+                else:
+                    loss += losses[name]
+            loss /= args.update_freq
+            loss.backward()
+            optimizer.second_step(zero_grad=True)
+        else:
+            scaler.scale(loss).backward()
+            if (batch_id+1) % args.update_freq == 0:
+                scaler.step(optimizer)
+                scaler.update() # next batch.
+                optimizer.zero_grad()
 
         
         """ log """
@@ -376,6 +414,7 @@ def test(args, model, test_loader):
     for name in msg:
         if msg[name]>best_acc:
             best_acc = msg[name]
+    msg["Test_acc"] = best_acc
 
     return  best_acc
 
@@ -394,7 +433,7 @@ if __name__ == "__main__":
     wandb.run.summary["best_accuracy"] = best_acc
     save_dist = False
     for epoch in range(args.max_epochs):
-        
+        print(f"Training Epoch:{epoch}")
         # control save distribution or not.
         if epoch == 0 or (epoch+1) % args.test_freq == 0:
             save_dist = True
@@ -419,11 +458,11 @@ if __name__ == "__main__":
 
         if epoch == 0 or (epoch+1) % args.test_freq == 0:
             test_acc = test(args, model, test_loader)
-            wandb.log({"test_acc":test_acc})
             # save to best.pt
             torch.save(save_dict, args.save_root + "backup/last.pth")
             if test_acc > best_acc:
                 best_acc = test_acc
+                print("Testing Acc & Best Acc: ", test_acc,best_acc)
                 wandb.run.summary["best_accuracy"] = best_acc # upload to wandb
                 wandb.run.summary["best_epoch"] = epoch+1 # upload to wandb
                 if os.path.isfile(args.save_root + "backup/best.pth"):

@@ -10,19 +10,31 @@ from data.dataset import ImageDataset
 from config_eval import get_args
 from torchvision import transforms
 import tqdm
+import ttach as tta
+from PIL import Image
 import os
 os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 
 def set_environment(args):
 
     args.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    normalize = transforms.Normalize(
+            mean=[0.485, 0.456, 0.406],
+            std=[0.229, 0.224, 0.225]
+    )
+    val_transforms = transforms.Compose([
+        transforms.Resize((600, 600), Image.BILINEAR),
+        transforms.CenterCrop((args.data_size, args.data_size)),
+        transforms.ToTensor(),
+        normalize
+    ])
 
     data_transform = transforms.Compose([
         transforms.CenterCrop(args.data_size),
         transforms.ToTensor(),
     ])
-    test_set = ValOrchidDataset(args.data_root,data_transform)
-    test_loader = torch.utils.data.DataLoader(test_set, num_workers=1, shuffle=True, batch_size=args.batch_size)
+    test_set = ValOrchidDataset(args.data_root,val_transforms) # data_transform
+    test_loader = torch.utils.data.DataLoader(test_set, num_workers=1, shuffle=False, batch_size=args.batch_size)
 
     print("test samples: {}, test batchs: {}".format(len(test_set), len(test_loader)))
     
@@ -101,6 +113,28 @@ def test(args, model, test_loader):
             total += batch_size
 
             datas, labels = datas.to(args.device), labels.to(args.device)
+
+            args.tta = True
+            if args.tta:
+                logits = torch.zeros(219).to(args.device)
+                TTA_transforms = tta.Compose(
+                [
+                    tta.HorizontalFlip(),
+                    tta.Rotate90(angles=[0, 180]),
+                    # tta.Multiply(factors=[0.9, 1, 1.1]),        
+                ])   
+                for transformer in TTA_transforms:
+                    augmented_image = transformer.augment_image(datas)
+                    # pass to model
+                    _, _, batch_logits = model(augmented_image,labels, return_preds=True)
+                    logits = logits.add(batch_logits['gcn'])
+
+                print(logits.shape)
+                answer = torch.argmax(logits, dim=1)
+                print(answer.shape)
+                print(answer)
+                exit()
+
 
             """ forward """
             _, batch_accs, batch_logits = model(datas, labels, return_preds=True)

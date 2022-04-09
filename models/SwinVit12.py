@@ -46,30 +46,6 @@ class GCN(nn.Module):
         self.conv_k1 = nn.Conv1d(in_features, in_features//4, 1)
         self.alpha1 = nn.Parameter(torch.zeros(1))
 
-        # # 2
-        # self.pool2 = nn.Linear(joints[0], joints[1])
-
-        # A = torch.eye(joints[1])/100 + 1/100
-        # self.adj2 = nn.Parameter(copy.deepcopy(A))
-        # self.conv2 = nn.Conv1d(in_features, in_features, 1)
-        # self.batch_norm2 = nn.BatchNorm1d(in_features)
-        
-        # self.conv_q2 = nn.Conv1d(in_features, in_features//4, 1)
-        # self.conv_k2 = nn.Conv1d(in_features, in_features//4, 1)
-        # self.alpha2 = nn.Parameter(torch.zeros(1))
-
-        # # 3
-        # self.pool3 = nn.Linear(joints[1], joints[2])
-        
-        # A = torch.eye(joints[2])/100 + 1/100
-        # self.adj3 = nn.Parameter(copy.deepcopy(A))
-        # self.conv3 = nn.Conv1d(in_features, in_features, 1)
-        # self.batch_norm3 = nn.BatchNorm1d(in_features)
-        
-        # self.conv_q3 = nn.Conv1d(in_features, in_features//4, 1)
-        # self.conv_k3 = nn.Conv1d(in_features, in_features//4, 1)
-        # self.alpha3 = nn.Parameter(torch.zeros(1))
-
         self.pool4 = nn.Linear(joints[0], 1)
         
         self.dropout = nn.Dropout(p=0.1)
@@ -89,99 +65,12 @@ class GCN(nn.Module):
         x = torch.matmul(x, A1)
         x = self.batch_norm1(x)
 
-        # x = self.pool2(x)
-        # q2 = self.conv_q2(x).mean(1)
-        # k2 = self.conv_k2(x).mean(1)
-        # A2 = self.tanh(q2.unsqueeze(-1) - k2.unsqueeze(1))
-        # A2 = self.adj2 + A2 * self.alpha2
-        # x = self.conv2(x)
-        # x = torch.matmul(x, A2)
-        # x = self.batch_norm2(x)
-
-        # x = self.pool3(x)
-        # q3 = self.conv_q3(x).mean(1)
-        # k3 = self.conv_k3(x).mean(1)
-        # A3 = self.tanh(q3.unsqueeze(-1) - k3.unsqueeze(1))
-        # A3 = self.adj3 + A3 * self.alpha3
-        # x = self.conv3(x)
-        # x = torch.matmul(x, A3)
-        # x = self.batch_norm3(x)
-
         x = self.pool4(x)
         x = self.dropout(x)
         x = x.flatten(1)
         x = self.classifier(x)
         
         return x
-
-
-
-# class GCN(nn.Module):
-
-#     def __init__(self, 
-#                  num_joints: int, 
-#                  in_features: int, 
-#                  num_classes: int,
-#                  use_global_token: bool = False):
-#         super(GCN, self).__init__()
-#         self.num_joints = num_joints
-#         self.in_features = in_features
-#         self.num_classes = num_classes
-
-#         A = torch.eye(num_joints)/4000 + 1/4000
-
-#         self.batch_norm1 = nn.BatchNorm1d(in_features)
-
-#         self.adj1 = nn.Parameter(copy.deepcopy(A))
-
-#         self.conv1 = nn.Conv1d(in_features, in_features, 1)
-        
-#         self.conv_q = nn.Conv1d(in_features, in_features//4, 1)
-#         self.conv_k = nn.Conv1d(in_features, in_features//4, 1)
-
-#         self.alpha = nn.Parameter(torch.zeros(1))
-
-#         # self.adj2 = nn.Parameter(A)
-
-#         # self.conv1 = nn.Sequential(
-#         #     nn.Conv1d(in_features, 4*in_features, 1),
-#         #     nn.Dropout(p=0.2),
-#         #     nn.GELU(),
-#         #     nn.Conv1d(4*in_features, in_features, 1),
-#         # )
-
-#         # self.conv2 = nn.Sequential(
-#         #     nn.Conv1d(in_features, 4*in_features, 1),
-#         #     nn.Dropout(p=0.2),
-#         #     nn.GELU(),
-#         #     nn.Conv1d(4*in_features, in_features, 1),
-#         # )
-        
-#         self.dropout = nn.Dropout(p=0.1)
-#         self.classifier = nn.Conv1d(in_features, num_classes, 1)
-
-#         self.avgpool = nn.AdaptiveAvgPool1d((1))
-
-#         self.tanh = nn.Tanh()
-
-#     def forward(self, x):
-#         """
-#         x size: [B, C, N]
-#         """
-
-#         q = self.conv_q(x).mean(1)
-#         k = self.conv_k(x).mean(1)
-#         A = self.tanh(q.unsqueeze(-1) - k.unsqueeze(1))
-#         A = self.adj1 + A * self.alpha
-#         x = self.conv1(x)
-#         x = torch.matmul(x, A)
-#         x = self.batch_norm1(x)
-        
-#         x = self.dropout(x)
-#         x = self.avgpool(x)
-#         x = self.classifier(x)
-        
-#         return x
 
 class SwinVit12(nn.Module):
 
