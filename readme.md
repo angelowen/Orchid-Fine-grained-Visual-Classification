@@ -2,7 +2,7 @@
 paper url: https://arxiv.org/abs/2202.03822 
 
 We propose a novel plug-in module that can be integrated to many common
-backbones, including CNN-based or Transformer-based networks to provide strongly discriminative regions. The plugin module can output pixel-level feature maps and fuse filtered features to enhance fine-grained visual classification. Experimental results show that the proposed plugin module outperforms state-ofthe-art approaches and significantly improves the accuracy to **92.77%** and **92.83%** on CUB200-2011 and NABirds, respectively.
+backbones, including CNN-based or Transformer-based networks to provide strongly discriminative regions. The plugin module can output pixel-level feature maps and fuse filtered features to enhance fine-grained visual classification. Experimental results show that the proposed plugin module outperforms the accuracy to **92.379%** on 2022 Orchid Dataset.
 ## Framework
 [A Novel Plug-in Module for Fine-grained Visual Classification](https://github.com/chou141253/FGVC-PIM)
 
@@ -48,6 +48,10 @@ python eval.py --pretrained_path "./records/Orchid2022/backup/best.pth"
 configuration file:  config_plot.py  
 ```
 python plot_heat.py --pretrained_path "./records/Orchid2022/backup/best.pth" --img_path "./imgs/0a1h7votc5.jpg"
+```
+### 5. Output Submission File
+```
+python test.py
 ```
 
 ## Reference

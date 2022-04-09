@@ -12,8 +12,6 @@ import torchvision.transforms as transforms
 from PIL import Image
 import matplotlib.pyplot as plt
 from config_plot import get_args
-import os
-os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 
 def set_environment(args):
 

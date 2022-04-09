@@ -32,12 +32,12 @@ def get_args():
     
     # loader
     parser.add_argument("--num_workers", default=4, type=int)
-    parser.add_argument("--batch_size", default=4, type=int)
+    parser.add_argument("--batch_size", default=32, type=int)
     
     # about model building
     parser.add_argument("--num_classes", default=219, type=int)
     
-    parser.add_argument("--test_global_top_confs", default=[1,3, 5], type=list)
+    parser.add_argument("--test_global_top_confs", default=[0, 1, 2, 3, 4, 5], type=list)
 
     args = parser.parse_args()
 
