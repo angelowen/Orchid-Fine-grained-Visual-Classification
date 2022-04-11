@@ -1,11 +1,15 @@
 import argparse
 import os
-
+import time
+import yaml
 def get_args():
-
+    
+    t = time.localtime()
+    run_time = time.strftime("%Y_%m_%d_%H_%M_%S", t)
+    
     parser = argparse.ArgumentParser("FineGrained Image Classification Task")
     # save path and dataset information
-    parser.add_argument("--exp_name", default="Orchid2022")
+    parser.add_argument("--exp_name", default=f"{run_time}")
     
     parser.add_argument("--data_root", default="./dataset", type=str) 
     parser.add_argument("--data_size", default=384, type=int)
@@ -30,7 +34,7 @@ def get_args():
     parser.add_argument("--global_feature_dim", default=1536, type=int)
     
     # loader
-    parser.add_argument("--num_workers", default=4, type=int)
+    parser.add_argument("--num_workers", default=8, type=int)
     parser.add_argument("--batch_size", default=4, type=int)
     
     # about model building
@@ -69,13 +73,26 @@ def build_record_folder(args):
     os.makedirs(args.save_root, exist_ok=True)
     
     print("...{}...".format(args.save_root), end="")
-    
-    # save labeled images path and unlabeled images path.
-    # os.makedirs(args.save_root + "data_info/", exist_ok=True)
-    os.makedirs(args.save_root + "backup/", exist_ok=True)
-    # os.makedirs(args.save_root + "distributions/", exist_ok=True)
-    
-    print("...{}...".format(args.save_root + "x_ux_info/"), end="")
+    os.makedirs(args.save_root, exist_ok=True)
+
+
+    dict_file = [{ 'Experiment Time': args.exp_name,
+                'Data_size': args.data_size,
+                'Sub_data_size': args.sub_data_size,
+                'Model_name': args.model_name,
+                'Optimizer': args.optimizer_name,
+                'Num_selects':args.num_selects,
+                'Global_feature_dim': args.global_feature_dim,
+                'warmup_batchs': args.warmup_batchs,
+                'Max_LR':args.max_lr,
+                'Update_freq':args.update_freq,
+                'Weight_Decay': args.wdecay,
+                'Max epochs':args.max_epochs,
+                }]
+
+    with open(f'./{args.save_root}/config.yaml', 'w') as file:
+        documents = yaml.dump(dict_file, file)
+
     print("...finish")
     print()
     return args

@@ -108,8 +108,11 @@ def set_environment(args):
     model_dict = model.state_dict()
     # 1. filter out unnecessary keys
     pretrained_dict = {k: v for k, v in pretrained_dict.items() if k in model_dict}
-    for k in ['classifier_l0.3.weight','classifier_l0.3.bias','classifier_l1.3.weight','classifier_l1.3.bias','classifier_l2.3.weight','classifier_l2.3.bias','classifier_l3.3.weight','classifier_l3.3.bias','gcn.classifier.weight','gcn.classifier.bias']:
-        del pretrained_dict[k]
+    for k in ['extractor.head.weight','extractor.head.bias','classifier_l0.3.weight','classifier_l0.3.bias','classifier_l1.3.weight','classifier_l1.3.bias','classifier_l2.3.weight','classifier_l2.3.bias','classifier_l3.3.weight','classifier_l3.3.bias','gcn.classifier.weight','gcn.classifier.bias']:
+        try:
+            del pretrained_dict[k]
+        except:
+            pass
     # 2. overwrite entries in the existing state dict
     model_dict.update(pretrained_dict) 
     # 3. load the new state dict
@@ -405,16 +408,15 @@ def test(args, model, test_loader):
             # print(total, accuracys)
 
     # acc_final, acc_l1, acc_l2, acc_l3, acc_gcn
+    best_acc = -1
     msg = {}
     for name in accuracys:
         msg["test_acc/test_acc_"+name] = 100*accuracys[name]/total
-    wandb.log(msg)
-
-    best_acc = -1
-    for name in msg:
-        if msg[name]>best_acc:
-            best_acc = msg[name]
+        if msg["test_acc/test_acc_"+name] > best_acc:
+            best_acc = msg["test_acc/test_acc_"+name]
+            
     msg["Test_acc"] = best_acc
+    wandb.log(msg)
 
     return  best_acc
 
@@ -459,16 +461,13 @@ if __name__ == "__main__":
         if epoch == 0 or (epoch+1) % args.test_freq == 0:
             test_acc = test(args, model, test_loader)
             # save to best.pt
-            torch.save(save_dict, args.save_root + "backup/last.pth")
+            torch.save(save_dict, args.save_root + "last.pth")
             if test_acc > best_acc:
                 best_acc = test_acc
                 print("Testing Acc & Best Acc: ", test_acc,best_acc)
                 wandb.run.summary["best_accuracy"] = best_acc # upload to wandb
                 wandb.run.summary["best_epoch"] = epoch+1 # upload to wandb
-                if os.path.isfile(args.save_root + "backup/best.pth"):
-                    os.remove(args.save_root + "backup/best.pth")
-                torch.save(save_dict, args.save_root + "backup/best.pth")
+                if os.path.isfile(args.save_root + "best.pth"):
+                    os.remove(args.save_root + "best.pth")
+                torch.save(save_dict, args.save_root + "best.pth")
 
-        # # save to last.pt
-        # if os.path.isfile(args.save_root + "backup/last.pth"):
-        #     os.remove(args.save_root + "backup/last.pth")

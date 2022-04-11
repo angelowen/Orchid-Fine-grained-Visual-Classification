@@ -6,7 +6,6 @@ import numpy as np
 import math
 import copy
 from dataset import TrainOrchidDataset,ValOrchidDataset
-from data.dataset import ImageDataset
 from config_eval import get_args
 from torchvision import transforms
 import tqdm
@@ -86,6 +85,8 @@ def set_environment(args):
             )
 
     checkpoint = torch.load(args.pretrained_path)
+    print(f"\n\nLoading checkpoint {args.pretrained_path}")
+    print("Please check if it is the right position!!")
     model.load_state_dict(checkpoint['model'])
     model.to(args.device)
 
@@ -114,7 +115,7 @@ def test(args, model, test_loader):
 
             datas, labels = datas.to(args.device), labels.to(args.device)
 
-            args.tta = True
+            args.tta = False
             if args.tta:
                 logits = torch.zeros(219).to(args.device)
                 TTA_transforms = tta.Compose(

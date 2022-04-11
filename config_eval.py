@@ -5,7 +5,9 @@ def get_args():
 
     parser = argparse.ArgumentParser("")
     
-    parser.add_argument("--pretrained_path", default="./records/Orchid2022/backup/best.pth", type=str)
+    checkpoint_L = ["./records/"+name for name in os.listdir("./records") if os.path.isdir("./records/"+name)]
+    checkpoint = max(checkpoint_L, key=os.path.getctime) 
+    parser.add_argument("--pretrained_path", default=f"{checkpoint}/best.pth", type=str)
     parser.add_argument("--data_root", default="./dataset", type=str) 
     parser.add_argument("--data_size", default=384, type=int)
     parser.add_argument("--num_rows", default=0, type=int)

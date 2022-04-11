@@ -27,6 +27,18 @@ Download the pretrained model from this url: https://drive.google.com/drive/fold
 * resnet50_miil_21k.pth and vit_base_patch16_224_miil_21k.pth are imagenet21k pretrained model (place these file under models/)
 * backup/ is our pretrained model path.(Downlaoad from https://drive.google.com/drive/folders/1KFSaAXgYBIxgTHozs37Z1-zJSyiFw80L and rename the pretrained model to `pretrained.pth`)
 
+```
+mkdir backup/
+cd backup/
+wget --load-cookies /tmp/cookies.txt "https://docs.google.com/uc?export=download&confirm=$(wget --quiet --save-cookies /tmp/cookies.txt --keep-session-cookies --no-check-certificate 'https://docs.google.com/uc?export=download&id=1_1KQJ0Pox7CdcvP_83V48BBBz6FC8HCd' -O- | sed -rn 's/.*confirm=([0-9A-Za-z_]+).*/\1\n/p')&id=1_1KQJ0Pox7CdcvP_83V48BBBz6FC8HCd" -O pretrained.pth && rm -rf /tmp/cookies.txt
+
+cd ../models/
+
+wget --load-cookies /tmp/cookies.txt "https://docs.google.com/uc?export=download&confirm=$(wget --quiet --save-cookies /tmp/cookies.txt --keep-session-cookies --no-check-certificate 'https://docs.google.com/uc?export=download&id=1M8yl08JldjKBNPDNBRP1O4V05RY4zwyn' -O- | sed -rn 's/.*confirm=([0-9A-Za-z_]+).*/\1\n/p')&id=1M8yl08JldjKBNPDNBRP1O4V05RY4zwyn" -O resnet50_miil_21k.pth && rm -rf /tmp/cookies.txt
+
+wget --load-cookies /tmp/cookies.txt "https://docs.google.com/uc?export=download&confirm=$(wget --quiet --save-cookies /tmp/cookies.txt --keep-session-cookies --no-check-certificate 'https://docs.google.com/uc?export=download&id=1_BCBlzqXk3rer3T0-wPcZoOYq5x0pbpu' -O- | sed -rn 's/.*confirm=([0-9A-Za-z_]+).*/\1\n/p')&id=1_BCBlzqXk3rer3T0-wPcZoOYq5x0pbpu" -O vit_base_patch16_224_miil_21k.pth && rm -rf /tmp/cookies.txt
+
+```
 
 #### OS
 - [x] Windows10
@@ -54,5 +66,12 @@ python plot_heat.py --pretrained_path "./records/Orchid2022/backup/best.pth" --i
 python test.py
 ```
 
+## Data Generation
+1. [WS-DAN](https://github.com/GuYuc/WS-DAN.PyTorch?utm_source=catalyzex.com)
+2. [Stylegan2](https://github.com/lucidrains/stylegan2-pytorch)
+
 ## Reference
 1. [A Novel Plug-in Module for Fine-grained Visual Classification](https://github.com/chou141253/FGVC-PIM)
+2. [Test Time Augmentation](https://github.com/qubvel/ttach)
+
+
