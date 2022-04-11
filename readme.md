@@ -3,6 +3,11 @@ paper url: https://arxiv.org/abs/2202.03822
 
 We propose a novel plug-in module that can be integrated to many common
 backbones, including CNN-based or Transformer-based networks to provide strongly discriminative regions. The plugin module can output pixel-level feature maps and fuse filtered features to enhance fine-grained visual classification. Experimental results show that the proposed plugin module outperforms the accuracy to **92.379%** on 2022 Orchid Dataset.
+
+### Link to Other Method
+1. [TransFG by eritup45](https://github.com/eritup45/2022_Orchid_V2)
+2. [Coarse Grained Visual Classification](https://github.com/angelowen/2022_Orchid)
+
 ## Framework
 [A Novel Plug-in Module for Fine-grained Visual Classification](https://github.com/chou141253/FGVC-PIM)
 
@@ -40,10 +45,11 @@ wget --load-cookies /tmp/cookies.txt "https://docs.google.com/uc?export=download
 
 ```
 #### Experiment
-    1. Optimizer: SGD 93.6
-    2. Optmizer: Sam 93.37
-	3. Optmizer: adamw + use_ori 89.26
-    
+    1. Optimizer: SGD 93.6%
+    2. Optimizer: SGD + data augmentation : **94.08%**
+    3. Optmizer: Sam 93.37%
+	4. Optmizer: adamw + use_ori 89.26%
+
 #### OS
 - [x] Windows10
 - [x] Ubuntu20.04
