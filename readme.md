@@ -66,5 +66,12 @@ python plot_heat.py --pretrained_path "./records/Orchid2022/backup/best.pth" --i
 python test.py
 ```
 
+## Data Generation
+1. [WS-DAN](https://github.com/GuYuc/WS-DAN.PyTorch?utm_source=catalyzex.com)
+2. [Stylegan2](https://github.com/lucidrains/stylegan2-pytorch)
+
 ## Reference
 1. [A Novel Plug-in Module for Fine-grained Visual Classification](https://github.com/chou141253/FGVC-PIM)
+2. [Test Time Augmentation](https://github.com/qubvel/ttach)
+
+
