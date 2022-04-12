@@ -14,6 +14,7 @@ from PIL import Image
 import pandas as pd
 import os
 from utils import SAM,enable_running_stats,smooth_crossentropy,disable_running_stats
+import yaml
 
 def get_lr(optimizer):
     for param_group in optimizer.param_groups:
@@ -415,7 +416,7 @@ def test(args, model, test_loader):
         if msg["test_acc/test_acc_"+name] > best_acc:
             best_acc = msg["test_acc/test_acc_"+name]
             
-    msg["Test_acc"] = best_acc
+    msg["Current_Test_Acc"] = best_acc
     wandb.log(msg)
 
     return  best_acc
@@ -464,6 +465,17 @@ if __name__ == "__main__":
             torch.save(save_dict, args.save_root + "last.pth")
             if test_acc > best_acc:
                 best_acc = test_acc
+                # save yaml
+                with open(args.save_root +"config.yaml",'r') as yamlfile:
+                    cur_yaml = yaml.safe_load(yamlfile)
+                    if epoch == 0:
+                        new_data = {'wandb': f"https://wandb.ai/angelowen/Orchid/runs/{wandb.run.id}/overview",'best_acc':best_acc} 
+                        cur_yaml[-1]['info'] = (new_data)
+                    else:
+                        cur_yaml[-1]['info']['best_acc'] = best_acc
+                with open(args.save_root +"config.yaml", 'w') as file:
+                    documents = yaml.safe_dump(cur_yaml, file)
+                    
                 print("Testing Acc & Best Acc: ", test_acc,best_acc)
                 wandb.run.summary["best_accuracy"] = best_acc # upload to wandb
                 wandb.run.summary["best_epoch"] = epoch+1 # upload to wandb

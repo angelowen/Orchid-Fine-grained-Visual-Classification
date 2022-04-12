@@ -90,7 +90,7 @@ def build_record_folder(args):
                 'Max epochs':args.max_epochs,
                 }]
 
-    with open(f'./{args.save_root}/config.yaml', 'w') as file:
+    with open(f'./{args.save_root}config.yaml', 'w') as file:
         documents = yaml.dump(dict_file, file)
 
     print("...finish")

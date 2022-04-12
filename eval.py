@@ -114,32 +114,27 @@ def test(args, model, test_loader):
             total += batch_size
 
             datas, labels = datas.to(args.device), labels.to(args.device)
+            _, batch_accs, batch_logits = model(datas, labels, return_preds=True)
+            
 
-            args.tta = False
             if args.tta:
-                logits = torch.zeros(219).to(args.device)
                 TTA_transforms = tta.Compose(
                 [
-                    tta.HorizontalFlip(),
-                    tta.Rotate90(angles=[0, 180]),
+                    # tta.HorizontalFlip(),
+                    # tta.Rotate90(angles=[0, 90]),
+                    tta.Add(values = [-1, 0, 1, 2]),
                     # tta.Multiply(factors=[0.9, 1, 1.1]),        
                 ])   
                 for transformer in TTA_transforms:
                     augmented_image = transformer.augment_image(datas)
                     # pass to model
-                    _, _, batch_logits = model(augmented_image,labels, return_preds=True)
-                    logits = logits.add(batch_logits['gcn'])
+                    _, _, b_logits = model(augmented_image,labels, return_preds=True)
+                    for name in b_logits:
+                        if name not in  batch_logits:
+                            batch_logits[name] = 0
+                        batch_logits[name]+=b_logits[name]
 
-                print(logits.shape)
-                answer = torch.argmax(logits, dim=1)
-                print(answer.shape)
-                print(answer)
-                exit()
-
-
-            """ forward """
-            _, batch_accs, batch_logits = model(datas, labels, return_preds=True)
-            
+            """ forward """        
             for name in batch_accs:
                 store_name = name
                 if store_name not in  accuracys:
@@ -159,7 +154,6 @@ def test(args, model, test_loader):
                     batch_logits[name] = torch.softmax(batch_logits[name], dim=-1)
                 elif name in ["gcn"]:
                     batch_logits[name] = torch.softmax(batch_logits[name], dim=-1)
-                
                 batch_logits[name] = batch_logits[name].cpu()
 
             # 1. ========= sum (average) =========
@@ -226,7 +220,6 @@ def test(args, model, test_loader):
             pbar.update(1)
 
     pbar.close()
-
     max_acc = -1
     msg = ""
     for name in accuracys:

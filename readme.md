@@ -45,10 +45,12 @@ wget --load-cookies /tmp/cookies.txt "https://docs.google.com/uc?export=download
 
 ```
 #### Experiment
-    1. Optimizer: SGD 93.6%
-    2. Optimizer: SGD + data augmentation : **94.08%**
-    3. Optmizer: Sam 93.37%
-	4. Optmizer: adamw + use_ori 89.26%
+1. Optimizer: SGD 93.6%
+2. Optimizer: SGD + data augmentation : 94.08%
+3. Optmizer: Sam 93.37%
+4. Optmizer: adamw + use_ori 89.26%
+5. TTA did not help!!
+6. Optimizer: SGD + data augmentation + label_smooth 0.2 :  **94.97%**
 
 #### OS
 - [x] Windows10

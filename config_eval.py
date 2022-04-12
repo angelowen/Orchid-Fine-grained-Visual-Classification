@@ -38,8 +38,8 @@ def get_args():
     
     # about model building
     parser.add_argument("--num_classes", default=219, type=int)
-    
     parser.add_argument("--test_global_top_confs", default=[1,3,5], type=list)
+    parser.add_argument("--tta",default=False, type=bool)
 
     args = parser.parse_args()
 

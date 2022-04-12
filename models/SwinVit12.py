@@ -181,7 +181,7 @@ class SwinVit12(nn.Module):
                            in_features = global_feature_dim, 
                            num_classes = num_classes)
 
-        self.crossentropy = nn.CrossEntropyLoss()
+        self.crossentropy = nn.CrossEntropyLoss(label_smoothing=0.3)
         self.bce = nn.BCEWithLogitsLoss()
         self.mseloss = nn.MSELoss()
         self.tanh = nn.Tanh()
