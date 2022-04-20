@@ -6,6 +6,8 @@ import math
 from scipy import ndimage
 import numpy as np
 import copy
+from utils import SwitchNorm1d,SwitchNorm2d
+# from AdMSLoss import AdMSoftmaxLoss
 
 def load_model_weights(model, model_path):
     state = torch.load(model_path, map_location='cpu')
@@ -67,10 +69,10 @@ class GCN(nn.Module):
 
         x = self.pool4(x)
         x = self.dropout(x)
-        x = x.flatten(1)
-        x = self.classifier(x)
+        feature = x.flatten(1)
+        logits = self.classifier(feature)
         
-        return x
+        return logits
 
 class SwinVit12(nn.Module):
 
@@ -175,13 +177,14 @@ class SwinVit12(nn.Module):
             num_joints = 0 # without global token.
             for n in self.num_selects:
                 if n != 0:
-                    num_joints += n
+                    num_joints += int(n)
 
             self.gcn = GCN(num_joints = num_joints, 
                            in_features = global_feature_dim, 
                            num_classes = num_classes)
 
-        self.crossentropy = nn.CrossEntropyLoss(label_smoothing=0.3)
+        self.crossentropy = nn.CrossEntropyLoss(label_smoothing=0.2)
+        # self.admsloss = AdMSoftmaxLoss(global_feature_dim, self.num_classes, s=30.0, m=0.4)
         self.bce = nn.BCEWithLogitsLoss()
         self.mseloss = nn.MSELoss()
         self.tanh = nn.Tanh()

@@ -55,9 +55,11 @@ def get_args():
     parser.add_argument("--test_freq", default=3, type=int)
     parser.add_argument("--test_global_top_confs", default=[1, 3, 5], type=list)
     parser.add_argument("--test_select_top_confs", default=[1, 3, 5, 7, 9], type=list)
-    parser.add_argument("--pretrained_path", default='./backup/pretrained.pth', type=str)
+    parser.add_argument("--pretrained_path", default='./backup/pretrained.pth', type=str,choices=['./backup/pretrained.pth','./backup/pretrained_NABirds.pth'])
 
     args = parser.parse_args()
+    if args.pretrained_path=='./backup/pretrained_NABirds.pth':
+        args.num_selects = [256, 128, 64, 32]
     args = build_record_folder(args)
 
     return args

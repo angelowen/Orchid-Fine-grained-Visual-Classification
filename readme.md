@@ -43,14 +43,19 @@ wget --load-cookies /tmp/cookies.txt "https://docs.google.com/uc?export=download
 
 wget --load-cookies /tmp/cookies.txt "https://docs.google.com/uc?export=download&confirm=$(wget --quiet --save-cookies /tmp/cookies.txt --keep-session-cookies --no-check-certificate 'https://docs.google.com/uc?export=download&id=1_BCBlzqXk3rer3T0-wPcZoOYq5x0pbpu' -O- | sed -rn 's/.*confirm=([0-9A-Za-z_]+).*/\1\n/p')&id=1_BCBlzqXk3rer3T0-wPcZoOYq5x0pbpu" -O vit_base_patch16_224_miil_21k.pth && rm -rf /tmp/cookies.txt
 
+wget --load-cookies /tmp/cookies.txt "https://docs.google.com/uc?export=download&confirm=$(wget --quiet --save-cookies /tmp/cookies.txt --keep-session-cookies --no-check-certificate 'https://docs.google.com/uc?export=download&id=19GEFdUcn4x8lEg5M1ABM0Nrf3ZpDpJ8H' -O- | sed -rn 's/.*confirm=([0-9A-Za-z_]+).*/\1\n/p')&id=19GEFdUcn4x8lEg5M1ABM0Nrf3ZpDpJ8H" -O pretrained_NABirds.pth && rm -rf /tmp/cookies.txt
+
 ```
 #### Experiment
-1. Optimizer: SGD 93.6%
-2. Optimizer: SGD + data augmentation : 94.08%
+1. Optimizer: SGD 93.6% (no data augmentation)
+2. Optimizer: SGD : 94.08%
 3. Optmizer: Sam 93.37%
 4. Optmizer: adamw + use_ori 89.26%
 5. TTA did not help!!
-6. Optimizer: SGD + data augmentation + label_smooth 0.2 :  **94.97%**
+6. Optimizer: SGD + label_smooth 0.2 :  **94.97%**
+7. Optimizer: SGD + label_smooth 0.3 : 93.6%
+8. Optimizer: SGD + label_smooth 0.2 + silu activation+ switch normalize: 94.29%
+9. Loss function: admsloss did not help!!
 
 #### OS
 - [x] Windows10

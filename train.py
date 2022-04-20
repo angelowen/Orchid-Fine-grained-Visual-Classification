@@ -108,12 +108,7 @@ def set_environment(args):
     pretrained_dict = checkpoint['model']
     model_dict = model.state_dict()
     # 1. filter out unnecessary keys
-    pretrained_dict = {k: v for k, v in pretrained_dict.items() if k in model_dict}
-    for k in ['extractor.head.weight','extractor.head.bias','classifier_l0.3.weight','classifier_l0.3.bias','classifier_l1.3.weight','classifier_l1.3.bias','classifier_l2.3.weight','classifier_l2.3.bias','classifier_l3.3.weight','classifier_l3.3.bias','gcn.classifier.weight','gcn.classifier.bias']:
-        try:
-            del pretrained_dict[k]
-        except:
-            pass
+    pretrained_dict = {k: v for k, v in pretrained_dict.items() if k in model_dict and pretrained_dict[k].shape == model_dict[k].shape}
     # 2. overwrite entries in the existing state dict
     model_dict.update(pretrained_dict) 
     # 3. load the new state dict
@@ -476,7 +471,7 @@ if __name__ == "__main__":
                 with open(args.save_root +"config.yaml", 'w') as file:
                     documents = yaml.safe_dump(cur_yaml, file)
                     
-                print("Testing Acc & Best Acc: ", test_acc,best_acc)
+                print("Best Acc: ", best_acc)
                 wandb.run.summary["best_accuracy"] = best_acc # upload to wandb
                 wandb.run.summary["best_epoch"] = epoch+1 # upload to wandb
                 if os.path.isfile(args.save_root + "best.pth"):
