@@ -229,12 +229,19 @@ if __name__ == "__main__":
         for idx in range(num):
             ans = df.iloc[idx][2:].mode()[0] # start from voter_1
             answer.append(ans)
+        '''     # Get Accuracy in following lines
             # ans1 = df['voter_1'][idx]
             # if ans != ans1:
             #     print(idx+2)
             if ans == df['category'][idx]:
                 correct+=1
-        print(correct/num)        
+        print(correct/num)
+        ''' 
+        output_file = "./Vote_Final_submission.csv"
+        df = pd.read_csv('dataset/val_label.csv')
+        df['category'] = answer
+        df.to_csv(output_file, index=False)
+        print("finished!!")       
     else:    
         test_loader, model = set_environment(args)
         test(args, model, test_loader)

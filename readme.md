@@ -2,7 +2,7 @@
 paper url: https://arxiv.org/abs/2202.03822 
 
 We propose a novel plug-in module that can be integrated to many common
-backbones, including CNN-based or Transformer-based networks to provide strongly discriminative regions. The plugin module can output pixel-level feature maps and fuse filtered features to enhance fine-grained visual classification. Experimental results show that the proposed plugin module outperforms the accuracy to **92.379%** on 2022 Orchid Dataset.
+backbones, including CNN-based or Transformer-based networks to provide strongly discriminative regions. The plugin module can output pixel-level feature maps and fuse filtered features to enhance fine-grained visual classification. Experimental results show that the proposed plugin module outperforms the accuracy to **94.97%** on 2022 Orchid Dataset and got **95.43%** Using Voting skills.
 
 ### Link to Other Method
 1. [TransFG by eritup45](https://github.com/eritup45/2022_Orchid_V2)
@@ -80,7 +80,7 @@ python plot_heat.py --pretrained_path "./records/Orchid2022/backup/best.pth" --i
 ```
 ### 5. Output Submission File
 ```
-python test.py
+python test.py --pretrained_path ./records/best.pth
 ```
 ### 6. Output Voting Results
 ```
@@ -89,8 +89,8 @@ python test.py
 3. python Voting.py --tv
 ```
 #### Model For Voting
-1. backup/best_94_97.pth
-2. backup/best_94_06.pth
+1. backup/best_94_97.pth 
+2. backup/best_510_94_97.pth (change `val_transforms` in `Voting.py`-> transforms.Resize((510, 510)))
 3. backup/best_birds_94_97.pth (change `args.num_selects` in `config_eval.py`)
 
 ## Data Generation
