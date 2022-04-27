@@ -1,6 +1,7 @@
 *.txt
 *.pth
 *.zip
+*.csv
 wandb/
 records/
 dataset/

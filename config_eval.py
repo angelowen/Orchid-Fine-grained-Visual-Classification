@@ -40,7 +40,7 @@ def get_args():
     parser.add_argument("--num_classes", default=219, type=int)
     parser.add_argument("--test_global_top_confs", default=[1,3,5], type=list)
     parser.add_argument("--tta",default=False, type=bool)
-
+    parser.add_argument("--tv",help = 'test with voting after csv is done',default=False, action='store_true')
     args = parser.parse_args()
 
     return args

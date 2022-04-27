@@ -82,6 +82,16 @@ python plot_heat.py --pretrained_path "./records/Orchid2022/backup/best.pth" --i
 ```
 python test.py
 ```
+### 6. Output Voting Results
+```
+1. python Voting.py --pretrained_path "./records/...1"
+2. python Voting.py --pretrained_path "./records/...2"
+3. python Voting.py --tv
+```
+#### Model For Voting
+1. backup/best_94_97.pth
+2. backup/best_94_06.pth
+3. backup/best_birds_94_97.pth (change `args.num_selects` in `config_eval.py`)
 
 ## Data Generation
 1. [WS-DAN](https://github.com/GuYuc/WS-DAN.PyTorch?utm_source=catalyzex.com)

@@ -134,6 +134,7 @@ def test(args, model, test_loader):
                     batch_logits[name] = torch.softmax(batch_logits[name], dim=-1)
                 elif name in ["gcn"]:
                     batch_logits[name] = torch.softmax(batch_logits[name], dim=-1)
+                
                 batch_logits[name] = batch_logits[name].cpu()
 
             # 1. ========= sum (average) =========
@@ -204,10 +205,15 @@ def test(args, model, test_loader):
             pbar.update(1)
 
     pbar.close()
-    print(answer)
-    df = pd.read_csv ('dataset/val_label.csv')
-    df['category'] = answer
-    df.to_csv(("./Final_submission.csv"), index=False)
+    
+    output_file = "./Final_submission.csv"
+    if os.path.exists(output_file):
+        df = pd.read_csv(output_file)
+    else:   
+        df = pd.read_csv('dataset/val_label.csv')
+    exist_voter = len(df.columns)-2
+    df[f'voter_{exist_voter+1}'] = answer
+    df.to_csv(output_file, index=False)
     print("finished!!")
 
     
@@ -215,5 +221,20 @@ def test(args, model, test_loader):
 
 if __name__ == "__main__":
     args = get_args()
-    test_loader, model = set_environment(args)
-    test(args, model, test_loader)
+    if args.tv:
+        answer = []
+        correct = 0
+        df = pd.read_csv('./Final_submission.csv')
+        num = len(df['filename'])
+        for idx in range(num):
+            ans = df.iloc[idx][2:].mode()[0] # start from voter_1
+            answer.append(ans)
+            # ans1 = df['voter_1'][idx]
+            # if ans != ans1:
+            #     print(idx+2)
+            if ans == df['category'][idx]:
+                correct+=1
+        print(correct/num)        
+    else:    
+        test_loader, model = set_environment(args)
+        test(args, model, test_loader)
