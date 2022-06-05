@@ -5,12 +5,13 @@ import json
 import numpy as np
 import math
 import copy
-from dataset import TrainOrchidDataset,ValOrchidDataset
+from dataset import ValOrchidDataset,TestOrchidDataset
 from config_eval import get_args
 from torchvision import transforms
 import pandas as pd
 import tqdm
 from PIL import Image
+from os import listdir
 os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 
 def set_environment(args):
@@ -31,6 +32,8 @@ def set_environment(args):
         transforms.ToTensor(),
     ])
     test_set = ValOrchidDataset(args.data_root,val_transforms) # data_transform
+    # if no submission file (.csv)
+    # test_set = TestOrchidDataset(args.data_root,val_transforms)
     test_loader = torch.utils.data.DataLoader(test_set, num_workers=1, shuffle=False, batch_size=args.batch_size)
 
     print("test samples: {}, test batchs: {}".format(len(test_set), len(test_loader)))
@@ -204,11 +207,24 @@ def test(args, model, test_loader):
             pbar.update(1)
 
     pbar.close()
-    print(answer)
+    # write answer with submission file
     df = pd.read_csv ('dataset/val_label.csv')
     df['category'] = answer
     df.to_csv(("./Final_submission.csv"), index=False)
     print("finished!!")
+    
+    # if no submission file (.csv)
+    '''
+    filename = []
+    files = listdir(args.data_root)
+    for f in files:
+        filename.append(f)
+    df = pd.DataFrame(columns=['filename', 'category'])
+    df['filename'] = filename
+    df['category'] = answer
+    df.to_csv(("./Final_submission.csv"), index=False)
+    print("finished!!")
+    '''
 
     
 

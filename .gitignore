@@ -9,3 +9,6 @@ backup/*
 models/*.pth
 tmp.py
 *.pyc
+folder_class_ds/
+Orchid_Final_ds/
+ex_Orchid_Final_ds/

@@ -93,10 +93,27 @@ python test.py --pretrained_path ./records/best.pth
 2. backup/best_510_94_97.pth (change `val_transforms` in `Voting.py`-> transforms.Resize((510, 510)))
 3. backup/best_birds_94_97.pth (change `args.num_selects` in `config_eval.py`)
 
-## Data Generation
-1. [WS-DAN](https://github.com/GuYuc/WS-DAN.PyTorch?utm_source=catalyzex.com)
-2. [Stylegan2](https://github.com/lucidrains/stylegan2-pytorch)
+## Competion Using
+> All the paths are fixed
+> dataset Readme: https://gist.github.com/istar0me/4e098b7a0c3ba6177e6f06f7df5261d3
+* The number of photos
+    * Training Set: 2,190 photos
+    * Public Set: 40,285 photos
+    * Private Set: 41,425 photos
+```
+-/Orchid_Final_ds
+    -| 1.jpg
+    -| 2.jpg
+    ...
+-|submission_template.csv
 
+0. mkdir Orchid_Final_ds/img/
+0.1. unzip -P '<password1>' orchid_public_set.zip -d ./img
+0.2. unzip -P '<password2>' orchid_private_set.zip -d ./img
+0.3 Check number of files: find . -name '*.jpg' | wc -l
+1. python Competition.py --pretrained backup/best_94_97.pth --data_root ./Orchid_Final_ds/img/
+2. python Competition.py --data_root ./Orchid_Final_ds/img/ --vote
+```
 ## Reference
 1. [A Novel Plug-in Module for Fine-grained Visual Classification](https://github.com/chou141253/FGVC-PIM)
 2. [Test Time Augmentation](https://github.com/qubvel/ttach)

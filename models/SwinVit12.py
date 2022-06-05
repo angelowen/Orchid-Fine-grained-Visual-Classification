@@ -8,6 +8,7 @@ import numpy as np
 import copy
 from utils import SwitchNorm1d,SwitchNorm2d
 # from AdMSLoss import AdMSoftmaxLoss
+from pytorch_metric_learning import distances, losses, miners, reducers
 
 def load_model_weights(model, model_path):
     state = torch.load(model_path, map_location='cpu')
@@ -72,7 +73,7 @@ class GCN(nn.Module):
         feature = x.flatten(1)
         logits = self.classifier(feature)
         
-        return logits
+        return logits,feature
 
 class SwinVit12(nn.Module):
 
@@ -387,7 +388,7 @@ class SwinVit12(nn.Module):
         if self.use_gcn:
             selected_features = torch.cat(selected_features, dim=1) # B, S, C
             selected_features = selected_features.transpose(1, 2).contiguous()
-            logits["gcn"] = self.gcn(selected_features)
+            logits["gcn"],gcn_features = self.gcn(selected_features)
             losses["gcn"] = self.crossentropy(logits["gcn"], labels)
             accuracys["gcn"] = self._accuracy(logits["gcn"], labels)
 
