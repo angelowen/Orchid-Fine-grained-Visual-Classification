@@ -38,13 +38,14 @@ mkdir backup/
 cd backup/
 wget --load-cookies /tmp/cookies.txt "https://docs.google.com/uc?export=download&confirm=$(wget --quiet --save-cookies /tmp/cookies.txt --keep-session-cookies --no-check-certificate 'https://docs.google.com/uc?export=download&id=1_1KQJ0Pox7CdcvP_83V48BBBz6FC8HCd' -O- | sed -rn 's/.*confirm=([0-9A-Za-z_]+).*/\1\n/p')&id=1_1KQJ0Pox7CdcvP_83V48BBBz6FC8HCd" -O pretrained.pth && rm -rf /tmp/cookies.txt
 
+wget --load-cookies /tmp/cookies.txt "https://docs.google.com/uc?export=download&confirm=$(wget --quiet --save-cookies /tmp/cookies.txt --keep-session-cookies --no-check-certificate 'https://docs.google.com/uc?export=download&id=19GEFdUcn4x8lEg5M1ABM0Nrf3ZpDpJ8H' -O- | sed -rn 's/.*confirm=([0-9A-Za-z_]+).*/\1\n/p')&id=19GEFdUcn4x8lEg5M1ABM0Nrf3ZpDpJ8H" -O pretrained_NABirds.pth && rm -rf /tmp/cookies.txt
+
 cd ../models/
 
 wget --load-cookies /tmp/cookies.txt "https://docs.google.com/uc?export=download&confirm=$(wget --quiet --save-cookies /tmp/cookies.txt --keep-session-cookies --no-check-certificate 'https://docs.google.com/uc?export=download&id=1M8yl08JldjKBNPDNBRP1O4V05RY4zwyn' -O- | sed -rn 's/.*confirm=([0-9A-Za-z_]+).*/\1\n/p')&id=1M8yl08JldjKBNPDNBRP1O4V05RY4zwyn" -O resnet50_miil_21k.pth && rm -rf /tmp/cookies.txt
 
 wget --load-cookies /tmp/cookies.txt "https://docs.google.com/uc?export=download&confirm=$(wget --quiet --save-cookies /tmp/cookies.txt --keep-session-cookies --no-check-certificate 'https://docs.google.com/uc?export=download&id=1_BCBlzqXk3rer3T0-wPcZoOYq5x0pbpu' -O- | sed -rn 's/.*confirm=([0-9A-Za-z_]+).*/\1\n/p')&id=1_BCBlzqXk3rer3T0-wPcZoOYq5x0pbpu" -O vit_base_patch16_224_miil_21k.pth && rm -rf /tmp/cookies.txt
 
-wget --load-cookies /tmp/cookies.txt "https://docs.google.com/uc?export=download&confirm=$(wget --quiet --save-cookies /tmp/cookies.txt --keep-session-cookies --no-check-certificate 'https://docs.google.com/uc?export=download&id=19GEFdUcn4x8lEg5M1ABM0Nrf3ZpDpJ8H' -O- | sed -rn 's/.*confirm=([0-9A-Za-z_]+).*/\1\n/p')&id=19GEFdUcn4x8lEg5M1ABM0Nrf3ZpDpJ8H" -O pretrained_NABirds.pth && rm -rf /tmp/cookies.txt
 
 ```
 #### Experiment
