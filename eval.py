@@ -12,7 +12,7 @@ import tqdm
 import ttach as tta
 from PIL import Image
 import os
-os.environ["CUDA_VISIBLE_DEVICES"] = "1"
+# os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 
 def set_environment(args):
 
