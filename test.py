@@ -12,7 +12,7 @@ import pandas as pd
 import tqdm
 from PIL import Image
 from os import listdir
-os.environ["CUDA_VISIBLE_DEVICES"] = "1"
+# os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 
 def set_environment(args):
 
