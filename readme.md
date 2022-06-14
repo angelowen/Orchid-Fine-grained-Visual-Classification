@@ -1,11 +1,11 @@
 # 2022 Orchid Competition Based on PIM for Fine-grained Visual Classification
 ### Competition Link
 * https://tbrain.trendmicro.com.tw/Competitions/Details/20
-* Final Rank - **Top 2%**
+* **Final Rank - Top 2%**
     * Public Dataset: 14/743 
     * Private Dataset:  16/743
  * Detail:
-   * Classify 219 classes with only 10 image per class are given, dataset Readme: https://gist.github.com/istar0me/4e098b7a0c3ba6177e6f06f7df5261d3
+   * Classify 219 classes with only 10 images per class are given, dataset Readme: https://gist.github.com/istar0me/4e098b7a0c3ba6177e6f06f7df5261d3
 
 We propose a novel plug-in module that can be integrated to many common
 backbones, including CNN-based or Transformer-based networks to provide strongly discriminative regions. The plugin module can output pixel-level feature maps and fuse filtered features to enhance fine-grained visual classification. Experimental results show that the proposed plugin module outperforms the accuracy to **94.97%** on 2022 Orchid Dataset and got **95.43%** Using Voting skills.
