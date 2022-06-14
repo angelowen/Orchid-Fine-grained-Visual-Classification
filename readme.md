@@ -1,4 +1,5 @@
 # 2022 Orchid Competition Based on PIM for Fine-grained Visual Classification
+![](https://i.imgur.com/eC6e707.png)
 ### Competition Link
 * https://tbrain.trendmicro.com.tw/Competitions/Details/20
 * **Final Rank - Top 2%**
